@@ -1,0 +1,38 @@
+version: '2'
+services:
+    proxy:
+        build: ./build/proxy
+        links:
+            - api
+        ports:
+            - 81:81
+        volumes:
+            - ./data/proxy/log:/var/log/nginx
+    db:
+        image: mariadb
+        volumes:
+            - ./data/maria:/var/lib/mysql
+        environment:
+            - MYSQL_ROOT_PASSWORD=p@55w0rd
+            - MYSQL_DATABASE=api
+    api:
+        build: ./build/app
+        container_name: api
+        expose:
+            - "4000"
+        volumes:
+            - ./share/app:/usr/local/share
+        command: mix phoenix.server
+        links:
+            - db
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin
+        environment:
+            - PMA_ARBITRARY=1
+            - PMA_HOST=db
+            - PMA_USER=root
+            - PMA_PASSWORD=p@55w0rd
+        links:
+            - db
+        ports:
+            - 8880:80

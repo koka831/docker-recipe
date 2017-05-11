@@ -1,0 +1,27 @@
+version: '2'
+# dump.sql import =>
+# docker exec -i app_db_1 mysql -utest -p dev -e"$(cat db.sql)"
+services:
+  app:
+    depends_on:
+      - db
+    build: "./build/app"
+    ports:
+      - "8080:80"
+    volumes:
+      - './app:/var/www/html'
+    links:
+      - db
+  pma:
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - "8081:80"
+  db:
+    image: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ""
+      MYSQL_DATABASE: app
+    ports:
+      - "3306:3306"
+    volumes:
+      - "./data/mysql:/var/lib/mysql"
