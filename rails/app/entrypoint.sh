@@ -1,19 +1,27 @@
 #!/bin/bash
 
+: "cd WORKDIR" && {
+  # need to set env $WORKDIR on Dockerfile
+  cd $WORKDIR
+}
+
 : "install deps" && {
+  gem install bundler
   bundle install --quiet --path vendor/bundle
-  yarn install
+}
+
+: "install js deps" || {
+  npm install
 }
 
 : "setup database" && {
-  rake db:create
-  rake db:migrate
-  rake db:seed
-  rake db:seed_fu
+  bundle exec rails db:create
+  bundle exec rails db:migrate
+  bundle exec rails db:seed
 }
 
 : "run server" && {
-  cd /usr/src/app && bundle exec rails server -b '0.0.0.0' -p 3000
+  bundle exec rails server -b '0.0.0.0' -p 3000
 }
 
 
